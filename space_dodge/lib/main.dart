@@ -39,6 +39,8 @@ class _MyAppState extends State<MyApp> {
   late double widthBase;
   late double heightBase;
 
+  bool collided = false;
+
   late Timer everySecond;
   int score = 0;
 
@@ -58,136 +60,41 @@ class _MyAppState extends State<MyApp> {
     ufoPosition8 = (random.nextInt(400).toDouble() * -1) - 100;
     ufoPosition9 = (random.nextInt(400).toDouble() * -1) - 100;
 
+    double ufoUpdate(double ufoPosition, double speed, double baseFactor) {
+      var updateRandom = Random();
+      if (ufoPosition - (heightBase * 18) < (widthBase + 1) &&
+          ufoPosition - (heightBase * 18) > -(widthBase + 1) &&
+          rocketPosition - (widthBase * baseFactor) < (widthBase + 1) &&
+          rocketPosition - (widthBase * baseFactor) > -(widthBase + 1)) {
+        ufoPosition = updateRandom.nextInt(500).toDouble() * -1;
+        collided = true;
+        return ufoPosition;
+      } else if (ufoPosition < heightBase * 18) {
+        ufoPosition += speed;
+        return ufoPosition;
+      } else {
+        score += 1;
+        ufoPosition = updateRandom.nextInt(500).toDouble() * -1;
+        return ufoPosition;
+      }
+    }
+
     // defines a timer
     everySecond = Timer.periodic(Duration(milliseconds: 50), (Timer t) {
-      bool collided = false;
-      //Update position of UFO 1
-      if (ufoPosition1 - (heightBase * 18) < (widthBase + 1) &&
-          ufoPosition1 - (heightBase * 18) > -(widthBase + 1) &&
-          rocketPosition - (widthBase * 2) < (widthBase + 1) &&
-          rocketPosition - (widthBase * 2) > -(widthBase + 1)) {
-        collided = true;
-        ufoPosition1 = random.nextInt(500).toDouble() * -1;
-      } else if (ufoPosition1 < heightBase * 18) {
-        ufoPosition1 += 5;
-      } else {
-        score += 1;
-        ufoPosition1 = random.nextInt(500).toDouble() * -1;
-      }
-      //Update position of UFO 2
-      if (ufoPosition2 - (heightBase * 18) < (widthBase + 1) &&
-          ufoPosition2 - (heightBase * 18) > -(widthBase + 1) &&
-          rocketPosition - (widthBase * 4) < (widthBase + 1) &&
-          rocketPosition - (widthBase * 4) > -(widthBase + 1)) {
-        collided = true;
-        ufoPosition2 = random.nextInt(500).toDouble() * -1;
-      } else if (ufoPosition2 < 18 * heightBase) {
-        ufoPosition2 += 8;
-      } else {
-        score += 1;
+      ufoPosition1 = ufoUpdate(ufoPosition1, 5, 2);
+      ufoPosition2 = ufoUpdate(ufoPosition2, 8, 4);
+      ufoPosition3 = ufoUpdate(ufoPosition3, 7, 6);
+      ufoPosition4 = ufoUpdate(ufoPosition4, 6, 8);
+      ufoPosition5 = ufoUpdate(ufoPosition5, 8, 10);
+      ufoPosition6 = ufoUpdate(ufoPosition6, 5, 12);
+      ufoPosition7 = ufoUpdate(ufoPosition7, 6, 14);
+      ufoPosition8 = ufoUpdate(ufoPosition8, 8, 16);
+      ufoPosition9 = ufoUpdate(ufoPosition9, 6, 18);
 
-        ufoPosition2 = random.nextInt(500).toDouble() * -1;
-      }
-      //Update position of UFO 3
-      if (ufoPosition3 - (heightBase * 18) < (widthBase + 1) &&
-          ufoPosition3 - (heightBase * 18) > -(widthBase + 1) &&
-          rocketPosition - (widthBase * 4) < (widthBase + 1) &&
-          rocketPosition - (widthBase * 4) > -(widthBase + 1)) {
-        collided = true;
-        ufoPosition3 = random.nextInt(500).toDouble() * -1;
-      } else if (ufoPosition3 < 18 * heightBase) {
-        ufoPosition3 += 9;
-      } else {
-        score += 1;
-
-        ufoPosition3 = random.nextInt(500).toDouble() * -1;
-      }
-      //Update position of UFO 4
-      if (ufoPosition4 - (heightBase * 18) < (widthBase + 1) &&
-          ufoPosition4 - (heightBase * 18) > -(widthBase + 1) &&
-          rocketPosition - (widthBase * 8) < (widthBase + 1) &&
-          rocketPosition - (widthBase * 8) > -(widthBase + 1)) {
-        collided = true;
-        ufoPosition4 = random.nextInt(500).toDouble() * -1;
-      } else if (ufoPosition4 < 1000) {
-        ufoPosition4 += 6;
-      } else {
-        score += 1;
-
-        ufoPosition4 = random.nextInt(500).toDouble() * -1;
-      }
-      //Update position of UFO 5
-      if (ufoPosition5 - (heightBase * 18) < (widthBase + 1) &&
-          ufoPosition5 - (heightBase * 18) > -(widthBase + 1) &&
-          rocketPosition - (widthBase * 10) < (widthBase + 1) &&
-          rocketPosition - (widthBase * 10) > -(widthBase + 1)) {
-        collided = true;
-        ufoPosition5 = random.nextInt(500).toDouble() * -1;
-      } else if (ufoPosition5 < 18 * heightBase) {
-        ufoPosition5 += 8;
-      } else {
-        score += 1;
-
-        ufoPosition5 = random.nextInt(500).toDouble() * -1;
-      }
-      //Update position of UFO 6
-      if (ufoPosition6 - (heightBase * 18) < (widthBase + 1) &&
-          ufoPosition6 - (heightBase * 18) > -(widthBase + 1) &&
-          rocketPosition - (widthBase * 12) < (widthBase + 1) &&
-          rocketPosition - (widthBase * 12) > -(widthBase + 1)) {
-        collided = true;
-        ufoPosition6 = random.nextInt(500).toDouble() * -1;
-      } else if (ufoPosition6 < 18 * heightBase) {
-        ufoPosition6 += 5;
-      } else {
-        score += 1;
-
-        ufoPosition6 = random.nextInt(500).toDouble() * -1;
-      }
-      //Update position of UFO 7
-      if (ufoPosition7 - (heightBase * 18) < (widthBase + 1) &&
-          ufoPosition7 - (heightBase * 18) > -(widthBase + 1) &&
-          rocketPosition - (widthBase * 14) < (widthBase + 1) &&
-          rocketPosition - (widthBase * 14) > -(widthBase + 1)) {
-        collided = true;
-        ufoPosition7 = random.nextInt(500).toDouble() * -1;
-      } else if (ufoPosition7 < 18 * heightBase) {
-        ufoPosition7 += 6;
-      } else {
-        score += 1;
-
-        ufoPosition7 = random.nextInt(500).toDouble() * -1;
-      }
-      //Update position of UFO 8
-      if (ufoPosition8 - (heightBase * 18) < (widthBase + 1) &&
-          ufoPosition8 - (heightBase * 18) > -(widthBase + 1) &&
-          rocketPosition - (widthBase * 16) < (widthBase + 1) &&
-          rocketPosition - (widthBase * 16) > -(widthBase + 1)) {
-        collided = true;
-        ufoPosition8 = random.nextInt(500).toDouble() * -1;
-      } else if (ufoPosition8 < 18 * heightBase) {
-        ufoPosition8 += 5;
-      } else {
-        score += 1;
-
-        ufoPosition8 = random.nextInt(500).toDouble() * -1;
-      }
-      //Update position of UFO 9
-      if (ufoPosition9 - (heightBase * 18) < (widthBase + 1) &&
-          ufoPosition9 - (heightBase * 18) > -(widthBase + 1) &&
-          rocketPosition - (widthBase * 18) < (widthBase + 1) &&
-          rocketPosition - (widthBase * 18) > -(widthBase + 1)) {
-        collided = true;
-        ufoPosition9 = random.nextInt(500).toDouble() * -1;
-      } else if (ufoPosition9 < 18 * heightBase) {
-        ufoPosition9 += 5;
-      } else {
-        score += 1;
-
-        ufoPosition9 = random.nextInt(500).toDouble() * -1;
-      }
       //Refresh the UI
       if (collided == true) {
+        collided = false;
+        print('Score zerod');
         score = 0;
       }
       setState(() {});
@@ -208,6 +115,21 @@ class _MyAppState extends State<MyApp> {
         rocketPosition += widthBase;
       }
       setState(() {});
+    }
+
+    Widget ufoWidget(double ufo, double leftFactor) {
+      return Positioned(
+        top: ufo,
+        left: widthBase * leftFactor,
+        child: SizedBox(
+          height: widthBase * 2,
+          width: widthBase * 2,
+          child: Image.asset(
+            'images/ufo.png',
+            fit: BoxFit.cover,
+          ),
+        ),
+      );
     }
 
     return Scaffold(
@@ -265,114 +187,14 @@ class _MyAppState extends State<MyApp> {
               ),
             ),
           ),
-          Positioned(
-            top: ufoPosition1,
-            left: widthBase * 2,
-            child: SizedBox(
-              height: widthBase * 2,
-              width: widthBase * 2,
-              child: Image.asset(
-                'images/ufo.png',
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          Positioned(
-            top: ufoPosition2,
-            left: widthBase * 4,
-            child: SizedBox(
-              height: widthBase * 2,
-              width: widthBase * 2,
-              child: Image.asset(
-                'images/ufo.png',
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          Positioned(
-            top: ufoPosition3,
-            left: widthBase * 6,
-            child: SizedBox(
-              height: widthBase * 2,
-              width: widthBase * 2,
-              child: Image.asset(
-                'images/ufo.png',
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          Positioned(
-            top: ufoPosition4,
-            left: widthBase * 8,
-            child: SizedBox(
-              height: widthBase * 2,
-              width: widthBase * 2,
-              child: Image.asset(
-                'images/ufo.png',
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          Positioned(
-            top: ufoPosition5,
-            left: widthBase * 10,
-            child: SizedBox(
-              height: widthBase * 2,
-              width: widthBase * 2,
-              child: Image.asset(
-                'images/ufo.png',
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          Positioned(
-            top: ufoPosition6,
-            left: widthBase * 12,
-            child: SizedBox(
-              height: widthBase * 2,
-              width: widthBase * 2,
-              child: Image.asset(
-                'images/ufo.png',
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          Positioned(
-            top: ufoPosition7,
-            left: widthBase * 14,
-            child: SizedBox(
-              height: widthBase * 2,
-              width: widthBase * 2,
-              child: Image.asset(
-                'images/ufo.png',
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          Positioned(
-            top: ufoPosition8,
-            left: widthBase * 16,
-            child: SizedBox(
-              height: widthBase * 2,
-              width: widthBase * 2,
-              child: Image.asset(
-                'images/ufo.png',
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          Positioned(
-            top: ufoPosition9,
-            left: widthBase * 18,
-            child: SizedBox(
-              height: widthBase * 2,
-              width: widthBase * 2,
-              child: Image.asset(
-                'images/ufo.png',
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
+          ufoWidget(ufoPosition1, 2),
+          ufoWidget(ufoPosition2, 4),
+          ufoWidget(ufoPosition3, 6),
+          ufoWidget(ufoPosition4, 8),
+          ufoWidget(ufoPosition5, 10),
+          ufoWidget(ufoPosition6, 12),
+          ufoWidget(ufoPosition8, 14),
+          ufoWidget(ufoPosition9, 16),
           Positioned(
             child: Padding(
               padding: const EdgeInsets.all(20.0),
