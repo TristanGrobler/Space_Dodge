@@ -31,6 +31,7 @@ class Logic {
   final _ufo10PositionController = BehaviorSubject<double>();
   final _rocketPositionController = BehaviorSubject<double>();
   final _scoreController = BehaviorSubject<int>();
+  final _levelController = BehaviorSubject<int>();
 
   //Methods to retrieve stream values
   Stream<double> get ufo1Position => _ufo1PositionController.stream;
@@ -45,6 +46,7 @@ class Logic {
   Stream<double> get ufo10Position => _ufo10PositionController.stream;
   Stream<double> get rocketPosition => _rocketPositionController.stream;
   Stream<int> get score => _scoreController.stream;
+  Stream<int> get level => _levelController.stream;
 
   ///Start the game.
   startGame() {
@@ -59,11 +61,13 @@ class Logic {
     _ufo8PositionController.sink.add(getUFOStartPosition());
     _ufo9PositionController.sink.add(getUFOStartPosition());
     _scoreController.sink.add(0);
-    initialiseTimer();
+    _levelController.sink.add(0);
+    initialiseTimer(50);
   }
 
-  initialiseTimer() {
-    everySecond = Timer.periodic(Duration(milliseconds: 50), (Timer t) {
+  initialiseTimer(int milliseconds) {
+    everySecond =
+        Timer.periodic(Duration(milliseconds: milliseconds), (Timer t) {
       _ufo1PositionController.sink.add(
         ufoUpdate(_ufo1PositionController.value, 5, 2),
       );
@@ -97,6 +101,14 @@ class Logic {
         collided = false;
         print('Score zerod');
         _scoreController.sink.add(0);
+        _levelController.sink.add(1);
+        everySecond.cancel();
+        startGame();
+      }
+      if (_scoreController.value / 50 > _levelController.value) {
+        _levelController.sink.add(_levelController.value + 1);
+        everySecond.cancel();
+        initialiseTimer(milliseconds - 5);
       }
     });
   }
