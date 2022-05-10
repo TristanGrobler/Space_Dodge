@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:scroll_loop_auto_scroll/scroll_loop_auto_scroll.dart';
+import 'package:space_dodge/asteroid.dart';
 
 import 'logic.dart';
 
@@ -54,40 +58,45 @@ class _MyAppState extends State<MyApp> {
     );
 
     void _handleKeyEvent(RawKeyEvent event) {
-      setState(() {
-        String _message =
-            'Not a Q: Pressed 0x${event.logicalKey.keyId.toRadixString(16)}';
-        print(_message);
-
-        if (event.runtimeType.toString() == 'RawKeyDownEvent') {
-          if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
-            game.moveLeft();
-          } else if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
-            game.moveRight();
-          }
+      if (event.runtimeType.toString() == 'RawKeyDownEvent') {
+        if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
+          game.moveLeft();
+        } else if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
+          game.moveRight();
         }
-      });
+      }
     }
 
-    Widget ufoWidget(double? ufo, double leftFactor) {
-      return ufo == null || ufo < 0
-          ? Container()
-          : AnimatedPositioned(
-              top: ufo,
-              left: game.wb() * leftFactor,
+    Widget ufoWidget(double? ufoX, double? ufoY, int? type) {
+      String _getImage() {
+        switch (type) {
+          case 0:
+            return 'images/ufo.png';
+          case 1:
+            return 'images/asteroid_1.png';
+          case 2:
+            return 'images/asteroid_2.png';
+          default:
+            return 'images/ufo.png';
+        }
+      }
+
+      return ufoY != null && ufoX != null && ufoY > 0
+          ? AnimatedPositioned(
+              top: ufoY,
+              left: ufoX,
               duration: Duration(milliseconds: 50),
               child: SizedBox(
                 height: game.wb() * 2,
                 width: game.wb() * 2,
                 child: Image.asset(
-                  'images/ufo.png',
+                  _getImage(),
                   fit: BoxFit.cover,
                 ),
               ),
-            );
+            )
+          : Container();
     }
-
-    //FocusScope.of(context).requestFocus(_focusNode);
 
     return Scaffold(
       body: RawKeyboardListener(
@@ -96,7 +105,6 @@ class _MyAppState extends State<MyApp> {
         child: GestureDetector(
           onTap: () {
             FocusScope.of(context).requestFocus(_focusNode);
-            print('grabbed');
           },
           child: SafeArea(
             child: Stack(
@@ -107,42 +115,40 @@ class _MyAppState extends State<MyApp> {
                   child: Image.asset(
                     'images/space background.png',
                     fit: BoxFit.cover,
+                    repeat: ImageRepeat.repeat,
                   ),
                 ),
                 Positioned(
-                  left: 30.0,
-                  bottom: 30.0,
+                  left: 0.0,
+                  top: 50.0,
                   child: GestureDetector(
                     onTap: game.moveLeft,
                     child: Container(
-                      color: Colors.white30,
-                      child: Icon(
-                        Icons.chevron_left,
-                        size: 50.0,
-                      ),
+                      color: Colors.transparent,
+                      width: widget.width / 2,
+                      height: widget.height,
                     ),
                   ),
                 ),
                 Positioned(
-                  right: 30.0,
-                  bottom: 30.0,
+                  right: 0.0,
+                  top: 50.0,
                   child: GestureDetector(
                     onTap: game.moveRight,
                     child: Container(
-                      color: Colors.white30,
-                      child: Icon(
-                        Icons.chevron_right,
-                        size: 50.0,
-                      ),
+                      color: Colors.transparent,
+                      width: widget.width / 2,
+                      height: widget.height,
                     ),
                   ),
                 ),
                 StreamBuilder<double>(
                     stream: game.rocketPosition,
                     builder: (context, snapshot) {
+                      print(snapshot.data);
                       return AnimatedPositioned(
                         duration: Duration(milliseconds: 50),
-                        top: game.hb() * 18,
+                        top: game.hb() * 16,
                         left: snapshot.data == null ? -100 : snapshot.data,
                         child: SizedBox(
                           height: game.wb() * 2,
@@ -154,51 +160,158 @@ class _MyAppState extends State<MyApp> {
                         ),
                       );
                     }),
-                StreamBuilder<double>(
-                    stream: game.ufo1Position,
-                    builder: (context, snapshot) {
-                      return ufoWidget(snapshot.data, 2);
-                    }),
-                StreamBuilder<double>(
-                    stream: game.ufo2Position,
-                    builder: (context, snapshot) {
-                      return ufoWidget(snapshot.data, 4);
-                    }),
-                StreamBuilder<double>(
-                    stream: game.ufo3Position,
-                    builder: (context, snapshot) {
-                      return ufoWidget(snapshot.data, 6);
-                    }),
-                StreamBuilder<double>(
-                    stream: game.ufo4Position,
-                    builder: (context, snapshot) {
-                      return ufoWidget(snapshot.data, 8);
-                    }),
-                StreamBuilder<double>(
-                    stream: game.ufo5Position,
-                    builder: (context, snapshot) {
-                      return ufoWidget(snapshot.data, 10);
-                    }),
-                StreamBuilder<double>(
-                    stream: game.ufo6Position,
-                    builder: (context, snapshot) {
-                      return ufoWidget(snapshot.data, 12);
-                    }),
-                StreamBuilder<double>(
-                    stream: game.ufo7Position,
-                    builder: (context, snapshot) {
-                      return ufoWidget(snapshot.data, 14);
-                    }),
-                StreamBuilder<double>(
-                    stream: game.ufo8Position,
-                    builder: (context, snapshot) {
-                      return ufoWidget(snapshot.data, 16);
-                    }),
-                StreamBuilder<double>(
-                    stream: game.ufo9Position,
-                    builder: (context, snapshot) {
-                      return ufoWidget(snapshot.data, 18);
-                    }),
+                StreamBuilder<Asteroid>(
+                  stream: game.ufo1Position,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return StreamBuilder<List>(
+                          stream: snapshot.data!.ufoData,
+                          builder: (context, snap) {
+                            if (snap.hasData) {
+                              return ufoWidget(
+                                  snap.data![0], snap.data![1], snap.data![2]);
+                            } else {
+                              return Container();
+                            }
+                          });
+                    } else {
+                      return Container();
+                    }
+                  },
+                ),
+                StreamBuilder<Asteroid>(
+                  stream: game.ufo2Position,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return StreamBuilder<List>(
+                          stream: snapshot.data!.ufoData,
+                          builder: (context, snap) {
+                            if (snap.hasData) {
+                              return ufoWidget(
+                                  snap.data![0], snap.data![1], snap.data![2]);
+                            } else {
+                              return Container();
+                            }
+                          });
+                    } else {
+                      return Container();
+                    }
+                  },
+                ),
+                StreamBuilder<Asteroid>(
+                  stream: game.ufo3Position,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return StreamBuilder<List>(
+                          stream: snapshot.data!.ufoData,
+                          builder: (context, snap) {
+                            if (snap.hasData) {
+                              return ufoWidget(
+                                  snap.data![0], snap.data![1], snap.data![2]);
+                            } else {
+                              return Container();
+                            }
+                          });
+                    } else {
+                      return Container();
+                    }
+                  },
+                ),
+                StreamBuilder<Asteroid>(
+                  stream: game.ufo4Position,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return StreamBuilder<List>(
+                          stream: snapshot.data!.ufoData,
+                          builder: (context, snap) {
+                            if (snap.hasData) {
+                              return ufoWidget(
+                                  snap.data![0], snap.data![1], snap.data![2]);
+                            } else {
+                              return Container();
+                            }
+                          });
+                    } else {
+                      return Container();
+                    }
+                  },
+                ),
+                StreamBuilder<Asteroid>(
+                  stream: game.ufo5Position,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return StreamBuilder<List>(
+                          stream: snapshot.data!.ufoData,
+                          builder: (context, snap) {
+                            if (snap.hasData) {
+                              return ufoWidget(
+                                  snap.data![0], snap.data![1], snap.data![2]);
+                            } else {
+                              return Container();
+                            }
+                          });
+                    } else {
+                      return Container();
+                    }
+                  },
+                ),
+                StreamBuilder<Asteroid>(
+                  stream: game.ufo6Position,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return StreamBuilder<List>(
+                          stream: snapshot.data!.ufoData,
+                          builder: (context, snap) {
+                            if (snap.hasData) {
+                              return ufoWidget(
+                                  snap.data![0], snap.data![1], snap.data![2]);
+                            } else {
+                              return Container();
+                            }
+                          });
+                    } else {
+                      return Container();
+                    }
+                  },
+                ),
+                StreamBuilder<Asteroid>(
+                  stream: game.ufo7Position,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return StreamBuilder<List>(
+                          stream: snapshot.data!.ufoData,
+                          builder: (context, snap) {
+                            if (snap.hasData) {
+                              return ufoWidget(
+                                  snap.data![0], snap.data![1], snap.data![2]);
+                            } else {
+                              return Container();
+                            }
+                          });
+                    } else {
+                      return Container();
+                    }
+                  },
+                ),
+                StreamBuilder<Asteroid>(
+                  stream: game.ufo8Position,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return StreamBuilder<List>(
+                          stream: snapshot.data!.ufoData,
+                          builder: (context, snap) {
+                            if (snap.hasData) {
+                              return ufoWidget(
+                                  snap.data![0], snap.data![1], snap.data![2]);
+                            } else {
+                              return Container();
+                            }
+                          });
+                    } else {
+                      return Container();
+                    }
+                  },
+                ),
                 StreamBuilder<int>(
                   stream: game.score,
                   builder: (context, snapshot) {

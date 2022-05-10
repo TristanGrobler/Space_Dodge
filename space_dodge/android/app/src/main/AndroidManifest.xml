@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.dtd.space_dodge">
    <application
-        android:label="space_dodge"
+        android:label="Space Dodge"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <activity
