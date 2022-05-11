@@ -1,14 +1,18 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:space_dodge/asteroid.dart';
+import 'package:space_dodge/game_over_dialog.dart';
 
 class Logic {
   final double width;
   final double height;
+  final BuildContext context;
 
-  Logic({required this.width, required this.height}) {
+  Logic({required this.width, required this.height, required this.context}) {
     updateWidthAndBaseFactor(width, height);
     startGame();
   }
@@ -106,7 +110,8 @@ class Logic {
   }
 
   initialiseTimer(int milliseconds) {
-    _timer = Timer.periodic(Duration(milliseconds: milliseconds), (Timer t) {
+    _timer =
+        Timer.periodic(Duration(milliseconds: milliseconds), (Timer t) async {
       ufoUpdate(_ufo1PositionController);
       ufoUpdate(_ufo2PositionController);
       ufoUpdate(_ufo3PositionController);
@@ -118,12 +123,23 @@ class Logic {
 
       //Refresh the UI
       if (collided == true) {
+        _timer.cancel();
+        bool restart = await showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (BuildContext dialogContext) {
+              return GameOverDialog(
+                context: context,
+                level: _levelController.value,
+                score: _scoreController.value,
+              );
+            });
         collided = false;
-        print('Score zerod');
         _scoreController.sink.add(0);
         _levelController.sink.add(1);
-        _timer.cancel();
-        startGame();
+        if (restart == true) {
+          startGame();
+        }
       }
       if (_scoreController.value / 50 > _levelController.value) {
         _levelController.sink.add(_levelController.value + 1);

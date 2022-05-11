@@ -2,14 +2,17 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:scroll_loop_auto_scroll/scroll_loop_auto_scroll.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:space_dodge/asteroid.dart';
+import 'package:space_dodge/constants.dart';
 
+import 'ad_manager.dart';
 import 'logic.dart';
 
 void main() {
   runApp(
     MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: LayoutBuilder(
         builder: (context, BoxConstraints constraints) {
           return MyApp(
@@ -36,17 +39,27 @@ class _MyAppState extends State<MyApp> {
   late Logic game = Logic(
     width: MediaQuery.of(context).size.width,
     height: MediaQuery.of(context).size.height,
+    context: context,
+  );
+
+  final BannerAd myBanner = BannerAd(
+    size: const AdSize(width: 320, height: 50),
+    adUnitId: AdManager.bannerAdUnitId,
+    listener: const BannerAdListener(),
+    request: const AdRequest(),
   );
 
   @override
   void dispose() {
     _focusNode.dispose();
+    myBanner.dispose();
     game.dispose();
     super.dispose();
   }
 
   @override
   void initState() {
+    myBanner.load();
     super.initState();
   }
 
@@ -99,6 +112,7 @@ class _MyAppState extends State<MyApp> {
     }
 
     return Scaffold(
+      backgroundColor: kPrimaryColor,
       body: RawKeyboardListener(
         focusNode: _focusNode,
         onKey: _handleKeyEvent,
@@ -316,7 +330,7 @@ class _MyAppState extends State<MyApp> {
                   stream: game.score,
                   builder: (context, snapshot) {
                     return Positioned(
-                      top: 20.0,
+                      top: 70.0,
                       child: Padding(
                         padding: const EdgeInsets.all(20.0),
                         child: Text(
@@ -331,7 +345,7 @@ class _MyAppState extends State<MyApp> {
                   stream: game.level,
                   builder: (context, snapshot) {
                     return Positioned(
-                      top: 0.0,
+                      top: 50.0,
                       child: Padding(
                         padding: const EdgeInsets.all(20.0),
                         child: Text(
@@ -341,6 +355,18 @@ class _MyAppState extends State<MyApp> {
                       ),
                     );
                   },
+                ),
+                Positioned(
+                  top: 10,
+                  left: 0,
+                  child: Container(
+                    width: widget.width,
+                    height: 50,
+                    color: kPrimaryColor.withOpacity(0.5),
+                    child: AdWidget(
+                      ad: myBanner,
+                    ),
+                  ),
                 ),
               ],
             ),
