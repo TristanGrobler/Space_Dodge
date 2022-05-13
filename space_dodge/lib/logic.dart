@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:space_dodge/asteroid.dart';
 import 'package:space_dodge/game_over_dialog.dart';
+import 'package:space_dodge/prefs.dart';
 
 class Logic {
   final double width;
@@ -17,6 +18,7 @@ class Logic {
     startGame();
   }
 
+  //Declare variables for Game Logic.
   final _random = Random();
   late double _widthBase;
   late double _heightBase;
@@ -34,6 +36,7 @@ class Logic {
   final _ufo8PositionController = BehaviorSubject<Asteroid>();
   final _rocketPositionController = BehaviorSubject<double>();
   final _scoreController = BehaviorSubject<int>();
+  final _highScoreController = BehaviorSubject<int>();
   final _levelController = BehaviorSubject<int>();
   final _asteroidsController = BehaviorSubject<List<Asteroid>>();
 
@@ -48,12 +51,13 @@ class Logic {
   Stream<Asteroid> get ufo8Position => _ufo8PositionController.stream;
   Stream<double> get rocketPosition => _rocketPositionController.stream;
   Stream<int> get score => _scoreController.stream;
+  Stream<int> get highScore => _highScoreController.stream;
   Stream<int> get level => _levelController.stream;
   Stream<List<Asteroid>> get asteroids => _asteroidsController.stream;
 
   ///Start the game.
   startGame() {
-    print(width);
+    _highScoreController.sink.add(Prefs.highScore);
     _rocketPositionController.sink.add(width / 2 - _widthBase);
     _ufo1PositionController.sink.add(Asteroid(
       xPosition: _widthBase * 2,
@@ -124,6 +128,9 @@ class Logic {
       //Refresh the UI
       if (collided == true) {
         _timer.cancel();
+        if (_highScoreController.value < _scoreController.value) {
+          Prefs.highScore = _scoreController.value;
+        }
         bool restart = await showDialog(
             context: context,
             barrierDismissible: false,
@@ -139,6 +146,8 @@ class Logic {
         _levelController.sink.add(1);
         if (restart == true) {
           startGame();
+        } else if (restart == false) {
+          Navigator.of(context).pop();
         }
       }
       if (_scoreController.value / 50 > _levelController.value) {

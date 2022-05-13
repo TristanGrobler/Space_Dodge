@@ -28,8 +28,6 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
-	<key>GADApplicationIdentifier</key>
-    <string>ca-app-pub-6901421742104699~2215764874</string>
 
 </dict>
 </plist>

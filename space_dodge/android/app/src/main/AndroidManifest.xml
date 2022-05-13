@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.dtd.spacedodge">
    <application
-        android:label="Space Dodge"
+        android:label="Space Adventure Hero"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
        <meta-data
@@ -10,6 +10,7 @@
 
        <activity
             android:name=".MainActivity"
+           android:screenOrientation="portrait"
             android:exported="true"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"
