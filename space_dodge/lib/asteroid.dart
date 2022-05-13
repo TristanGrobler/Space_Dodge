@@ -1,17 +1,21 @@
 import 'package:rxdart/rxdart.dart';
+import 'package:flutter/material.dart';
 
-class Asteroid {
+class Asteroid extends StatefulWidget {
   final double xPosition;
   final double yPosition;
   final int type;
   final int speed;
+  final double baseFactor;
 
   Asteroid({
+    Key? key,
     required this.xPosition,
     required this.yPosition,
     required this.type,
     required this.speed,
-  }) {
+    required this.baseFactor,
+  }) : super(key: key) {
     _ufoXPositionController.sink.add(xPosition);
     _ufoYPositionController.sink.add(yPosition);
     _ufoTypeController.sink.add(type);
@@ -65,8 +69,55 @@ class Asteroid {
     return _ufoYPositionController.value;
   }
 
-  ///Get the speed of the asteroid
+  ///Get the speed of the asteroid.
   int getSpeed() {
     return _ufoSpeedController.value;
+  }
+
+  @override
+  State<Asteroid> createState() => _AsteroidState();
+}
+
+class _AsteroidState extends State<Asteroid> {
+  ///Get image needed for asteroid.
+  String getImageResource(int t) {
+    switch (t) {
+      case 0:
+        return 'assets/images/ufo.png';
+      case 1:
+        return 'assets/images/asteroid_1.png';
+      case 2:
+        return 'assets/images/asteroid_2.png';
+      default:
+        return 'assets/images/ufo.png';
+    }
+  }
+
+  /// Return widget of asteroid.
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<List>(
+        stream: widget.ufoData,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return snapshot.data![1] > 0
+                ? AnimatedPositioned(
+                    top: snapshot.data![1],
+                    left: snapshot.data![0],
+                    duration: const Duration(milliseconds: 50),
+                    child: SizedBox(
+                      height: widget.baseFactor,
+                      width: widget.baseFactor,
+                      child: Image.asset(
+                        getImageResource(snapshot.data![2]),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  )
+                : Container();
+          } else {
+            return Container();
+          }
+        });
   }
 }

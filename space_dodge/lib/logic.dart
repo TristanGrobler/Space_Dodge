@@ -3,9 +3,10 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:space_dodge/asteroid.dart';
-import 'package:space_dodge/game_over_dialog.dart';
+import 'package:space_dodge/screens/game_over_dialog.dart';
 import 'package:space_dodge/prefs.dart';
 
 class Logic {
@@ -24,31 +25,17 @@ class Logic {
   late double _heightBase;
   late Timer _timer;
   bool collided = false;
+  int baseTime = 50;
 
   //Declare controllers
-  final _ufo1PositionController = BehaviorSubject<Asteroid>();
-  final _ufo2PositionController = BehaviorSubject<Asteroid>();
-  final _ufo3PositionController = BehaviorSubject<Asteroid>();
-  final _ufo4PositionController = BehaviorSubject<Asteroid>();
-  final _ufo5PositionController = BehaviorSubject<Asteroid>();
-  final _ufo6PositionController = BehaviorSubject<Asteroid>();
-  final _ufo7PositionController = BehaviorSubject<Asteroid>();
-  final _ufo8PositionController = BehaviorSubject<Asteroid>();
   final _rocketPositionController = BehaviorSubject<double>();
   final _scoreController = BehaviorSubject<int>();
   final _highScoreController = BehaviorSubject<int>();
   final _levelController = BehaviorSubject<int>();
   final _asteroidsController = BehaviorSubject<List<Asteroid>>();
+  final _musicPlayer = AudioPlayer();
 
   //Methods to retrieve stream values
-  Stream<Asteroid> get ufo1Position => _ufo1PositionController.stream;
-  Stream<Asteroid> get ufo2Position => _ufo2PositionController.stream;
-  Stream<Asteroid> get ufo3Position => _ufo3PositionController.stream;
-  Stream<Asteroid> get ufo4Position => _ufo4PositionController.stream;
-  Stream<Asteroid> get ufo5Position => _ufo5PositionController.stream;
-  Stream<Asteroid> get ufo6Position => _ufo6PositionController.stream;
-  Stream<Asteroid> get ufo7Position => _ufo7PositionController.stream;
-  Stream<Asteroid> get ufo8Position => _ufo8PositionController.stream;
   Stream<double> get rocketPosition => _rocketPositionController.stream;
   Stream<int> get score => _scoreController.stream;
   Stream<int> get highScore => _highScoreController.stream;
@@ -59,74 +46,66 @@ class Logic {
   startGame() {
     _highScoreController.sink.add(Prefs.highScore);
     _rocketPositionController.sink.add(width / 2 - _widthBase);
-    _ufo1PositionController.sink.add(Asteroid(
-      xPosition: _widthBase * 2,
-      yPosition: getUFOStartPosition(),
-      type: _random.nextInt(3),
-      speed: _random.nextInt(5) + 5,
-    ));
-    _ufo2PositionController.sink.add(Asteroid(
-      xPosition: _widthBase * 4,
-      yPosition: getUFOStartPosition(),
-      type: _random.nextInt(3),
-      speed: _random.nextInt(5) + 5,
-    ));
-    _ufo3PositionController.sink.add(Asteroid(
-      xPosition: _widthBase * 6,
-      yPosition: getUFOStartPosition(),
-      type: _random.nextInt(3),
-      speed: _random.nextInt(5) + 5,
-    ));
-    _ufo4PositionController.sink.add(Asteroid(
-      xPosition: _widthBase * 8,
-      yPosition: getUFOStartPosition(),
-      type: _random.nextInt(3),
-      speed: _random.nextInt(5) + 5,
-    ));
-    _ufo5PositionController.sink.add(Asteroid(
-      xPosition: _widthBase * 10,
-      yPosition: getUFOStartPosition(),
-      type: _random.nextInt(3),
-      speed: _random.nextInt(5) + 5,
-    ));
-    _ufo6PositionController.sink.add(Asteroid(
-      xPosition: _widthBase * 12,
-      yPosition: getUFOStartPosition(),
-      type: _random.nextInt(3),
-      speed: _random.nextInt(5) + 5,
-    ));
-    _ufo7PositionController.sink.add(Asteroid(
-      xPosition: _widthBase * 14,
-      yPosition: getUFOStartPosition(),
-      type: _random.nextInt(3),
-      speed: _random.nextInt(5) + 5,
-    ));
-    _ufo8PositionController.sink.add(Asteroid(
-      xPosition: _widthBase * 16,
-      yPosition: getUFOStartPosition(),
-      type: _random.nextInt(3),
-      speed: _random.nextInt(5) + 5,
-    ));
-
     _scoreController.sink.add(0);
     _levelController.sink.add(0);
-    initialiseTimer(50);
+    List<Asteroid> _startList = [];
+    for (var i = 0; i < 8; i++) {
+      _startList.add(
+        Asteroid(
+          xPosition: _widthBase * (i + 1) * 2,
+          yPosition: getUFOStartPosition(),
+          type: _random.nextInt(3),
+          speed: _random.nextInt(5) + 5,
+          baseFactor: _widthBase * 2,
+        ),
+      );
+    }
+    _asteroidsController.sink.add(_startList);
+    initialiseTimer(baseTime);
+    startMusic();
+  }
+
+  startMusic() async {
+    await _musicPlayer.setAsset('assets/music/space_track.mp3');
+    await _musicPlayer.setLoopMode(LoopMode.one);
+    await _musicPlayer.play();
+  }
+
+  stopMusic() {
+    _musicPlayer.stop();
+  }
+
+  crashMusic() async {
+    await _musicPlayer.setAsset('assets/music/space_die.wav');
+    await _musicPlayer.setLoopMode(LoopMode.off);
+    _musicPlayer.play();
   }
 
   initialiseTimer(int milliseconds) {
     _timer =
         Timer.periodic(Duration(milliseconds: milliseconds), (Timer t) async {
-      ufoUpdate(_ufo1PositionController);
-      ufoUpdate(_ufo2PositionController);
-      ufoUpdate(_ufo3PositionController);
-      ufoUpdate(_ufo4PositionController);
-      ufoUpdate(_ufo5PositionController);
-      ufoUpdate(_ufo6PositionController);
-      ufoUpdate(_ufo7PositionController);
-      ufoUpdate(_ufo8PositionController);
+      // Call for each item in list to be updated.
+      for (var i = 0; i < _asteroidsController.value.length; i++) {
+        ufoUpdate(_asteroidsController.value[i]);
+      }
+      // Check to see if more asteroids need to be added
+      if (_asteroidsController.value.length < 8 + (_levelController.value)) {
+        List<Asteroid> _tempList = _asteroidsController.value;
+        _tempList.add(
+          Asteroid(
+            xPosition: _widthBase * _random.nextInt(9) * 2,
+            yPosition: getUFOStartPosition(),
+            type: _random.nextInt(3),
+            speed: _random.nextInt(5) + 5,
+            baseFactor: _widthBase * 2,
+          ),
+        );
+        _asteroidsController.sink.add(_tempList);
+      }
 
-      //Refresh the UI
+      //Check if collision occured.
       if (collided == true) {
+        crashMusic();
         _timer.cancel();
         if (_highScoreController.value < _scoreController.value) {
           Prefs.highScore = _scoreController.value;
@@ -153,16 +132,17 @@ class Logic {
       if (_scoreController.value / 50 > _levelController.value) {
         _levelController.sink.add(_levelController.value + 1);
         _timer.cancel();
-        initialiseTimer(milliseconds - 5);
+        baseTime -= 1;
+        initialiseTimer(baseTime);
       }
     });
   }
 
   /// Calculates the new UFO position and if it has collided with the rocket
-  ufoUpdate(BehaviorSubject<Asteroid> bs) {
-    double y = bs.value.getYPosition();
-    double x = bs.value.getXPosition();
-    int speed = bs.value.getSpeed();
+  ufoUpdate(Asteroid asteroid) {
+    double y = asteroid.getYPosition();
+    double x = asteroid.getXPosition();
+    int speed = asteroid.getSpeed();
     var updateRandom = Random();
     if (y - (_heightBase * 16) < (_widthBase + 1) &&
         y - (_heightBase * 16) > -(_widthBase + 1) &&
@@ -170,16 +150,16 @@ class Logic {
         _rocketPositionController.value - (x) > -(_widthBase + 1)) {
       y = updateRandom.nextInt(500).toDouble() * -1;
       collided = true;
-      bs.value.setYPosition(y);
+      asteroid.setYPosition(y);
     } else if (y < _heightBase * 21) {
       y += speed;
-      bs.value.setYPosition(y);
+      asteroid.setYPosition(y);
     } else {
       _scoreController.sink.add(_scoreController.value + 1);
       y = updateRandom.nextInt(500).toDouble() * -1;
-      bs.value.setYPosition(y);
-      bs.value.setType(updateRandom.nextInt(3));
-      bs.value.setSpeed(_random.nextInt(5) + 5);
+      asteroid.setYPosition(y);
+      asteroid.setType(updateRandom.nextInt(3));
+      asteroid.setSpeed(_random.nextInt(5) + 5);
     }
   }
 
@@ -223,18 +203,10 @@ class Logic {
 
   /// Dispose game logic
   dispose() {
-    // _ufo1PositionController.close();
-    // _ufo2PositionController.close();
-    // _ufo3PositionController.close();
-    // _ufo4PositionController.close();
-    // _ufo5PositionController.close();
-    // _ufo6PositionController.close();
-    // _ufo7PositionController.close();
-    // _ufo8PositionController.close();
-    // _ufo8PositionController.close();
     _asteroidsController.close();
     _scoreController.close();
     _levelController.close();
     _timer.cancel();
+    _musicPlayer.dispose();
   }
 }

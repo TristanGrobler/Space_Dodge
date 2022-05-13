@@ -16,7 +16,7 @@ class MenuScreen extends StatelessWidget {
         children: [
           Container(
             child: Image.asset(
-              'images/space background.png',
+              'assets/images/space background.png',
               fit: BoxFit.cover,
               height: height + 100,
               width: width,
@@ -43,7 +43,7 @@ class MenuScreen extends StatelessWidget {
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(15.0),
                               child: Image.asset(
-                                'images/icon.png',
+                                'assets/images/icon.png',
                                 fit: BoxFit.cover,
                                 width: width / 2,
                                 height: width / 2,
@@ -114,6 +114,18 @@ class MenuScreen extends StatelessWidget {
                             ),
                           ),
                         ),
+                      ),
+                    ),
+                    SizedBox(height: 50.0),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        'Music Credits: '
+                        'Space Fiction by Quarkstar (c) copyright 2018 Licensed '
+                        'under a Creative Commons Attribution Noncommercial  (3.0) '
+                        'license. http://dig.ccmixter.org/files/Quarkstar/57369 ',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 10.0, color: Colors.white60),
                       ),
                     ),
                     SizedBox(

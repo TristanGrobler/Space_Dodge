@@ -66,13 +66,13 @@ class _GameScreenState extends State<GameScreen> {
       String _getImage() {
         switch (type) {
           case 0:
-            return 'images/ufo.png';
+            return 'assets/images/ufo.png';
           case 1:
-            return 'images/asteroid_1.png';
+            return 'assets/images/asteroid_1.png';
           case 2:
-            return 'images/asteroid_2.png';
+            return 'assets/images/asteroid_2.png';
           default:
-            return 'images/ufo.png';
+            return 'assets/images/ufo.png';
         }
       }
 
@@ -103,270 +103,124 @@ class _GameScreenState extends State<GameScreen> {
             FocusScope.of(context).requestFocus(_focusNode);
           },
           child: SafeArea(
-            child: Stack(
-              children: [
-                Container(
-                  width: double.infinity,
-                  height: double.infinity,
-                  child: Image.asset(
-                    'images/space background.png',
-                    fit: BoxFit.cover,
-                    repeat: ImageRepeat.repeat,
-                  ),
-                ),
-                Positioned(
-                  left: 0.0,
-                  top: 50.0,
-                  child: GestureDetector(
-                    onTap: game.moveLeft,
-                    child: Container(
-                      color: Colors.transparent,
-                      width: widget.width / 2,
-                      height: widget.height,
-                    ),
-                  ),
-                ),
-                Positioned(
-                  right: 0.0,
-                  top: 50.0,
-                  child: GestureDetector(
-                    onTap: game.moveRight,
-                    child: Container(
-                      color: Colors.transparent,
-                      width: widget.width / 2,
-                      height: widget.height,
-                    ),
-                  ),
-                ),
-                StreamBuilder<double>(
-                    stream: game.rocketPosition,
-                    builder: (context, snapshot) {
-                      print(snapshot.data);
-                      return AnimatedPositioned(
-                        duration: Duration(milliseconds: 50),
-                        top: game.hb() * 16,
-                        left: snapshot.data == null ? -100 : snapshot.data,
-                        child: SizedBox(
-                          height: game.wb() * 2,
-                          width: game.wb() * 2,
-                          child: Image.asset(
-                            'images/rocket.png',
-                            fit: BoxFit.cover,
+            child: StreamBuilder<List<Asteroid>>(
+                stream: game.asteroids,
+                builder: (context, snapshot) {
+                  return Stack(
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        height: double.infinity,
+                        child: Image.asset(
+                          'assets/images/space background.png',
+                          fit: BoxFit.cover,
+                          repeat: ImageRepeat.repeat,
+                        ),
+                      ),
+                      Positioned(
+                        left: 0.0,
+                        top: 50.0,
+                        child: GestureDetector(
+                          onTap: game.moveLeft,
+                          child: Container(
+                            color: Colors.transparent,
+                            width: widget.width / 2,
+                            height: widget.height,
                           ),
                         ),
-                      );
-                    }),
-                StreamBuilder<Asteroid>(
-                  stream: game.ufo1Position,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      return StreamBuilder<List>(
-                          stream: snapshot.data!.ufoData,
-                          builder: (context, snap) {
-                            if (snap.hasData) {
-                              return ufoWidget(
-                                  snap.data![0], snap.data![1], snap.data![2]);
-                            } else {
-                              return Container();
-                            }
-                          });
-                    } else {
-                      return Container();
-                    }
-                  },
-                ),
-                StreamBuilder<Asteroid>(
-                  stream: game.ufo2Position,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      return StreamBuilder<List>(
-                          stream: snapshot.data!.ufoData,
-                          builder: (context, snap) {
-                            if (snap.hasData) {
-                              return ufoWidget(
-                                  snap.data![0], snap.data![1], snap.data![2]);
-                            } else {
-                              return Container();
-                            }
-                          });
-                    } else {
-                      return Container();
-                    }
-                  },
-                ),
-                StreamBuilder<Asteroid>(
-                  stream: game.ufo3Position,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      return StreamBuilder<List>(
-                          stream: snapshot.data!.ufoData,
-                          builder: (context, snap) {
-                            if (snap.hasData) {
-                              return ufoWidget(
-                                  snap.data![0], snap.data![1], snap.data![2]);
-                            } else {
-                              return Container();
-                            }
-                          });
-                    } else {
-                      return Container();
-                    }
-                  },
-                ),
-                StreamBuilder<Asteroid>(
-                  stream: game.ufo4Position,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      return StreamBuilder<List>(
-                          stream: snapshot.data!.ufoData,
-                          builder: (context, snap) {
-                            if (snap.hasData) {
-                              return ufoWidget(
-                                  snap.data![0], snap.data![1], snap.data![2]);
-                            } else {
-                              return Container();
-                            }
-                          });
-                    } else {
-                      return Container();
-                    }
-                  },
-                ),
-                StreamBuilder<Asteroid>(
-                  stream: game.ufo5Position,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      return StreamBuilder<List>(
-                          stream: snapshot.data!.ufoData,
-                          builder: (context, snap) {
-                            if (snap.hasData) {
-                              return ufoWidget(
-                                  snap.data![0], snap.data![1], snap.data![2]);
-                            } else {
-                              return Container();
-                            }
-                          });
-                    } else {
-                      return Container();
-                    }
-                  },
-                ),
-                StreamBuilder<Asteroid>(
-                  stream: game.ufo6Position,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      return StreamBuilder<List>(
-                          stream: snapshot.data!.ufoData,
-                          builder: (context, snap) {
-                            if (snap.hasData) {
-                              return ufoWidget(
-                                  snap.data![0], snap.data![1], snap.data![2]);
-                            } else {
-                              return Container();
-                            }
-                          });
-                    } else {
-                      return Container();
-                    }
-                  },
-                ),
-                StreamBuilder<Asteroid>(
-                  stream: game.ufo7Position,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      return StreamBuilder<List>(
-                          stream: snapshot.data!.ufoData,
-                          builder: (context, snap) {
-                            if (snap.hasData) {
-                              return ufoWidget(
-                                  snap.data![0], snap.data![1], snap.data![2]);
-                            } else {
-                              return Container();
-                            }
-                          });
-                    } else {
-                      return Container();
-                    }
-                  },
-                ),
-                StreamBuilder<Asteroid>(
-                  stream: game.ufo8Position,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      return StreamBuilder<List>(
-                          stream: snapshot.data!.ufoData,
-                          builder: (context, snap) {
-                            if (snap.hasData) {
-                              return ufoWidget(
-                                  snap.data![0], snap.data![1], snap.data![2]);
-                            } else {
-                              return Container();
-                            }
-                          });
-                    } else {
-                      return Container();
-                    }
-                  },
-                ),
-                StreamBuilder<int>(
-                  stream: game.highScore,
-                  builder: (context, snapshot) {
-                    return Positioned(
-                      top: 50.0,
-                      child: Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Text(
-                          'High Score: ${snapshot.data ?? 0}',
-                          style: TextStyle(color: Colors.white60),
+                      ),
+                      Positioned(
+                        right: 0.0,
+                        top: 50.0,
+                        child: GestureDetector(
+                          onTap: game.moveRight,
+                          child: Container(
+                            color: Colors.transparent,
+                            width: widget.width / 2,
+                            height: widget.height,
+                          ),
                         ),
                       ),
-                    );
-                  },
-                ),
-                StreamBuilder<int>(
-                  stream: game.score,
-                  builder: (context, snapshot) {
-                    return Positioned(
-                      top: 90.0,
-                      child: Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Text(
-                          'Score: ${snapshot.data ?? 0}',
-                          style: TextStyle(color: Colors.white60),
+                      StreamBuilder<double>(
+                          stream: game.rocketPosition,
+                          builder: (context, snapshot) {
+                            print(snapshot.data);
+                            return AnimatedPositioned(
+                              duration: Duration(milliseconds: 50),
+                              top: game.hb() * 16,
+                              left:
+                                  snapshot.data == null ? -100 : snapshot.data,
+                              child: SizedBox(
+                                height: game.wb() * 2,
+                                width: game.wb() * 2,
+                                child: Image.asset(
+                                  'assets/images/rocket.png',
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            );
+                          }),
+                      ...?snapshot.data,
+                      StreamBuilder<int>(
+                        stream: game.highScore,
+                        builder: (context, snapshot) {
+                          return Positioned(
+                            top: 50.0,
+                            child: Padding(
+                              padding: const EdgeInsets.all(20.0),
+                              child: Text(
+                                'High Score: ${snapshot.data ?? 0}',
+                                style: TextStyle(color: Colors.white60),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      StreamBuilder<int>(
+                        stream: game.score,
+                        builder: (context, snapshot) {
+                          return Positioned(
+                            top: 90.0,
+                            child: Padding(
+                              padding: const EdgeInsets.all(20.0),
+                              child: Text(
+                                'Score: ${snapshot.data ?? 0}',
+                                style: TextStyle(color: Colors.white60),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      StreamBuilder<int>(
+                        stream: game.level,
+                        builder: (context, snapshot) {
+                          return Positioned(
+                            top: 70.0,
+                            child: Padding(
+                              padding: const EdgeInsets.all(20.0),
+                              child: Text(
+                                'Level: ${snapshot.data ?? 0}',
+                                style: TextStyle(color: Colors.white60),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      Positioned(
+                        top: 10,
+                        left: 0,
+                        child: Container(
+                          width: widget.width,
+                          height: 50,
+                          color: kPrimaryColor.withOpacity(0.5),
+                          child: AdWidget(
+                            ad: myBanner,
+                          ),
                         ),
                       ),
-                    );
-                  },
-                ),
-                StreamBuilder<int>(
-                  stream: game.level,
-                  builder: (context, snapshot) {
-                    return Positioned(
-                      top: 70.0,
-                      child: Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Text(
-                          'Level: ${snapshot.data ?? 0}',
-                          style: TextStyle(color: Colors.white60),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-                Positioned(
-                  top: 10,
-                  left: 0,
-                  child: Container(
-                    width: widget.width,
-                    height: 50,
-                    color: kPrimaryColor.withOpacity(0.5),
-                    child: AdWidget(
-                      ad: myBanner,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+                    ],
+                  );
+                }),
           ),
         ),
       ),
