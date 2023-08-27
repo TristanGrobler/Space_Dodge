@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:space_dodge/asteroid.dart';
-import 'package:space_dodge/screens/game_over_dialog.dart';
 import 'package:space_dodge/prefs.dart';
+import 'package:space_dodge/screens/game_over_dialog.dart';
 
 class Logic {
   final double width;

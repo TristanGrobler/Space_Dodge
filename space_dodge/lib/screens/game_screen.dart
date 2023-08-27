@@ -117,30 +117,6 @@ class _GameScreenState extends State<GameScreen> {
                           repeat: ImageRepeat.repeat,
                         ),
                       ),
-                      Positioned(
-                        left: 0.0,
-                        top: 50.0,
-                        child: GestureDetector(
-                          onTap: game.moveLeft,
-                          child: Container(
-                            color: Colors.transparent,
-                            width: widget.width / 2,
-                            height: widget.height,
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        right: 0.0,
-                        top: 50.0,
-                        child: GestureDetector(
-                          onTap: game.moveRight,
-                          child: Container(
-                            color: Colors.transparent,
-                            width: widget.width / 2,
-                            height: widget.height,
-                          ),
-                        ),
-                      ),
                       StreamBuilder<double>(
                           stream: game.rocketPosition,
                           builder: (context, snapshot) {
@@ -205,6 +181,30 @@ class _GameScreenState extends State<GameScreen> {
                             ),
                           );
                         },
+                      ),
+                      Positioned(
+                        left: 0.0,
+                        top: 50.0,
+                        child: GestureDetector(
+                          onTap: game.moveLeft,
+                          child: Container(
+                            color: Colors.transparent,
+                            width: widget.width / 2,
+                            height: widget.height,
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        right: 0.0,
+                        top: 50.0,
+                        child: GestureDetector(
+                          onTap: game.moveRight,
+                          child: Container(
+                            color: Colors.transparent,
+                            width: widget.width / 2,
+                            height: widget.height,
+                          ),
+                        ),
                       ),
                       Positioned(
                         top: 10,
