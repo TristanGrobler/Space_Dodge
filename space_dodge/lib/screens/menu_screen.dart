@@ -4,11 +4,16 @@ import 'package:space_dodge/screens/game_screen.dart';
 
 import '../constants.dart';
 
-class MenuScreen extends StatelessWidget {
+class MenuScreen extends StatefulWidget {
   final double height;
   final double width;
   const MenuScreen({required this.height, required this.width});
 
+  @override
+  State<MenuScreen> createState() => _MenuScreenState();
+}
+
+class _MenuScreenState extends State<MenuScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,21 +23,19 @@ class MenuScreen extends StatelessWidget {
             child: Image.asset(
               'assets/images/space background.png',
               fit: BoxFit.cover,
-              height: height + 100,
-              width: width,
+              height: widget.height + 100,
+              width: widget.width,
             ),
           ),
           SafeArea(
             child: Container(
               color: kPrimaryColor.withOpacity(0.7),
-              height: height + 100,
-              width: width,
+              height: widget.height + 100,
+              width: widget.width,
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    SizedBox(
-                      height: 80,
-                    ),
+                    SizedBox(height: 80),
                     Center(
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(15.0),
@@ -45,8 +48,8 @@ class MenuScreen extends StatelessWidget {
                               child: Image.asset(
                                 'assets/images/icon.png',
                                 fit: BoxFit.cover,
-                                width: width / 2,
-                                height: width / 2,
+                                width: widget.width / 2,
+                                height: widget.width / 2,
                               ),
                             ),
                           ),
@@ -54,7 +57,7 @@ class MenuScreen extends StatelessWidget {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.all(width / 6),
+                      padding: EdgeInsets.all(widget.width / 6),
                       child: Text(
                         'Space Adventure Hero',
                         softWrap: true,
@@ -66,35 +69,32 @@ class MenuScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    SizedBox(
-                      height: 20.0,
-                    ),
+                    SizedBox(height: 20.0),
                     Text(
                       'High Score:',
-                      style: TextStyle(
-                        fontSize: 28.0,
-                        color: kSecondaryColor,
-                      ),
+                      style: TextStyle(fontSize: 28.0, color: kSecondaryColor),
                     ),
                     Text(
                       Prefs.highScore.toString(),
-                      style: TextStyle(
-                        fontSize: 28.0,
-                        color: kSecondaryColor,
-                      ),
+                      style: TextStyle(fontSize: 28.0, color: kSecondaryColor),
                     ),
-                    SizedBox(
-                      height: 80,
-                    ),
+                    SizedBox(height: 80),
                     ClipRRect(
                       child: GestureDetector(
-                        onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (BuildContext context) {
-                              return GameScreen(height: height, width: width);
-                            },
-                          ),
-                        ),
+                        onTap: () async {
+                          await Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (BuildContext context) {
+                                return GameScreen(
+                                  height: widget.height,
+                                  width: widget.width,
+                                );
+                              },
+                            ),
+                          );
+                          // Refresh the state when returning from game to update high score
+                          setState(() {});
+                        },
                         child: Card(
                           color: kPrimaryColor,
                           shape: RoundedRectangleBorder(
@@ -104,7 +104,11 @@ class MenuScreen extends StatelessWidget {
                           elevation: 5.0,
                           child: Padding(
                             padding: const EdgeInsets.fromLTRB(
-                                20.0, 10.0, 20.0, 10.0),
+                              20.0,
+                              10.0,
+                              20.0,
+                              10.0,
+                            ),
                             child: Text(
                               "Let's Fly",
                               style: TextStyle(
@@ -128,9 +132,7 @@ class MenuScreen extends StatelessWidget {
                         style: TextStyle(fontSize: 10.0, color: Colors.white60),
                       ),
                     ),
-                    SizedBox(
-                      height: 100,
-                    ),
+                    SizedBox(height: 100),
                   ],
                 ),
               ),

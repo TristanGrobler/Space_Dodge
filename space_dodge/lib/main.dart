@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:space_dodge/prefs.dart';
 import 'package:space_dodge/screens/menu_screen.dart';
